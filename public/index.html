@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>TaskFlow - Gestionnaire de taches</title>
+<title>TaskFlow - Gestionnaire de tâches</title>
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -11,7 +11,7 @@
   <h1>TaskFlow</h1>
   <div id="user-box" class="user-box hidden">
     <span id="user-email"></span>
-    <button id="logout-btn" class="btn btn-ghost">Deconnexion</button>
+    <button id="logout-btn" class="btn btn-ghost">Déconnexion</button>
   </div>
 </header>
 
@@ -20,7 +20,7 @@
   <section id="auth-section" class="card">
     <div class="tabs">
       <button class="tab-btn active" data-tab="login">Connexion</button>
-      <button class="tab-btn" data-tab="register">Creer un compte</button>
+      <button class="tab-btn" data-tab="register">Créer un compte</button>
     </div>
 
     <form id="login-form" class="tab-panel">
@@ -43,16 +43,16 @@
         <input type="email" name="email" required autocomplete="email" />
       </label>
       <label>
-        Mot de passe (8 caracteres minimum)
+        Mot de passe (8 caractères minimum)
         <input type="password" name="password" required minlength="8" autocomplete="new-password" />
       </label>
-      <button type="submit" class="btn btn-primary">Creer mon compte</button>
+      <button type="submit" class="btn btn-primary">Créer mon compte</button>
     </form>
   </section>
 
   <section id="app-section" class="hidden">
     <div class="card">
-      <h2>Nouvelle tache</h2>
+      <h2>Nouvelle tâche</h2>
       <p id="task-form-error" class="error hidden"></p>
       <form id="task-form" class="task-form">
         <input type="hidden" name="id" />
@@ -68,13 +68,13 @@
           <label>
             Statut
             <select name="status">
-              <option value="todo">A faire</option>
+              <option value="todo">À faire</option>
               <option value="in_progress">En cours</option>
-              <option value="done">Terminee</option>
+              <option value="done">Terminée</option>
             </select>
           </label>
           <label>
-            Echeance
+            Échéance
             <input type="date" name="due_date" />
           </label>
         </div>
@@ -87,16 +87,16 @@
 
     <div class="card">
       <div class="list-header">
-        <h2>Mes taches</h2>
+        <h2>Mes tâches</h2>
         <select id="filter-status">
           <option value="">Toutes</option>
-          <option value="todo">A faire</option>
+          <option value="todo">À faire</option>
           <option value="in_progress">En cours</option>
-          <option value="done">Terminee</option>
+          <option value="done">Terminée</option>
         </select>
       </div>
       <ul id="task-list" class="task-list"></ul>
-      <p id="empty-state" class="empty hidden">Aucune tache pour le moment.</p>
+      <p id="empty-state" class="empty hidden">Aucune tâche pour le moment.</p>
     </div>
   </section>
 

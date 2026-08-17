@@ -46,7 +46,7 @@ router.get('/', listQueryValidators, validate, (req, res) => {
 // READ (one)
 router.get('/:id', idParamValidator, validate, (req, res) => {
   const task = findOneStmt.get(req.params.id, req.user.id);
-  if (!task) return res.status(404).json({ error: 'Tache introuvable.' });
+  if (!task) return res.status(404).json({ error: 'Tâche introuvable.' });
   res.json({ task });
 });
 
@@ -61,7 +61,7 @@ router.post('/', createTaskValidators, validate, (req, res) => {
 // UPDATE
 router.put('/:id', updateTaskValidators, validate, (req, res) => {
   const existing = findOneStmt.get(req.params.id, req.user.id);
-  if (!existing) return res.status(404).json({ error: 'Tache introuvable.' });
+  if (!existing) return res.status(404).json({ error: 'Tâche introuvable.' });
 
   const title = req.body.title ?? existing.title;
   const description = req.body.description ?? existing.description;
@@ -76,7 +76,7 @@ router.put('/:id', updateTaskValidators, validate, (req, res) => {
 // DELETE
 router.delete('/:id', idParamValidator, validate, (req, res) => {
   const existing = findOneStmt.get(req.params.id, req.user.id);
-  if (!existing) return res.status(404).json({ error: 'Tache introuvable.' });
+  if (!existing) return res.status(404).json({ error: 'Tâche introuvable.' });
 
   deleteStmt.run(req.params.id, req.user.id);
   res.status(204).send();

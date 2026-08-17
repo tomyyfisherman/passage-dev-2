@@ -25,7 +25,7 @@ app.use('/api', (req, res) => {
   res.status(404).json({ error: 'Route API introuvable.' });
 });
 
-// gestionnaire d'erreurs generique (JSON malforme, etc.)
+// gestionnaire d'erreurs générique (JSON malformé, etc.)
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(err.status || 500).json({ error: 'Erreur serveur inattendue.' });
@@ -33,5 +33,5 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Serveur demarre sur http://localhost:${PORT}`);
+  console.log(`Serveur démarré sur http://localhost:${PORT}`);
 });

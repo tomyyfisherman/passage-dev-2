@@ -23,7 +23,7 @@ router.post('/register', registerValidators, validate, (req, res) => {
 
   const existing = findUserByEmailStmt.get(email);
   if (existing) {
-    return res.status(409).json({ error: 'Un compte existe deja avec cet email.' });
+    return res.status(409).json({ error: 'Un compte existe déjà avec cet email.' });
   }
 
   const passwordHash = hashPassword(password);

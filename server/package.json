@@ -1,7 +1,7 @@
 {
   "name": "passage-dev2-server",
   "version": "1.0.0",
-  "description": "API + serveur statique pour l'application de gestion de taches (Passage Developpeur II)",
+  "description": "API + serveur statique pour l'application de gestion de tâches (Passage Développeur II)",
   "private": true,
   "main": "src/index.js",
   "scripts": {

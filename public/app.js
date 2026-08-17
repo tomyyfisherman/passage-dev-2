@@ -1,7 +1,7 @@
 const STATUS_LABELS = {
-  todo: 'A faire',
+  todo: 'À faire',
   in_progress: 'En cours',
-  done: 'Terminee',
+  done: 'Terminée',
 };
 
 const state = {
@@ -187,7 +187,7 @@ function renderTasks() {
         <p class="task-desc"></p>
         <div class="task-meta">
           <span class="badge badge-${task.status}">${STATUS_LABELS[task.status]}</span>
-          ${due ? `<span>Echeance : ${due}</span>` : ''}
+          ${due ? `<span>Échéance : ${due}</span>` : ''}
         </div>
       </div>
       <div class="task-actions">
@@ -219,7 +219,7 @@ function startEdit(task) {
 }
 
 async function deleteTask(id) {
-  if (!confirm('Supprimer cette tache ?')) return;
+  if (!confirm('Supprimer cette tâche ?')) return;
   try {
     await api(`/tasks/${id}`, { method: 'DELETE' });
     if (state.editingId === id) resetTaskForm();

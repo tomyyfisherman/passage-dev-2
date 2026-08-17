@@ -8,7 +8,7 @@ const registerValidators = [
     .normalizeEmail(),
   body('password')
     .isString()
-    .isLength({ min: 8, max: 72 }).withMessage('Le mot de passe doit contenir entre 8 et 72 caracteres.'),
+    .isLength({ min: 8, max: 72 }).withMessage('Le mot de passe doit contenir entre 8 et 72 caractères.'),
 ];
 
 const loginValidators = [
