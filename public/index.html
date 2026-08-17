@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TaskFlow - Gestionnaire de taches</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header class="topbar">
+  <h1>TaskFlow</h1>
+  <div id="user-box" class="user-box hidden">
+    <span id="user-email"></span>
+    <button id="logout-btn" class="btn btn-ghost">Deconnexion</button>
+  </div>
+</header>
+
+<main class="container">
+
+  <section id="auth-section" class="card">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="login">Connexion</button>
+      <button class="tab-btn" data-tab="register">Creer un compte</button>
+    </div>
+
+    <form id="login-form" class="tab-panel">
+      <p id="login-error" class="error hidden"></p>
+      <label>
+        Email
+        <input type="email" name="email" required autocomplete="email" />
+      </label>
+      <label>
+        Mot de passe
+        <input type="password" name="password" required autocomplete="current-password" />
+      </label>
+      <button type="submit" class="btn btn-primary">Se connecter</button>
+    </form>
+
+    <form id="register-form" class="tab-panel hidden">
+      <p id="register-error" class="error hidden"></p>
+      <label>
+        Email
+        <input type="email" name="email" required autocomplete="email" />
+      </label>
+      <label>
+        Mot de passe (8 caracteres minimum)
+        <input type="password" name="password" required minlength="8" autocomplete="new-password" />
+      </label>
+      <button type="submit" class="btn btn-primary">Creer mon compte</button>
+    </form>
+  </section>
+
+  <section id="app-section" class="hidden">
+    <div class="card">
+      <h2>Nouvelle tache</h2>
+      <p id="task-form-error" class="error hidden"></p>
+      <form id="task-form" class="task-form">
+        <input type="hidden" name="id" />
+        <label>
+          Titre
+          <input type="text" name="title" required maxlength="200" />
+        </label>
+        <label>
+          Description
+          <textarea name="description" maxlength="2000" rows="2"></textarea>
+        </label>
+        <div class="row">
+          <label>
+            Statut
+            <select name="status">
+              <option value="todo">A faire</option>
+              <option value="in_progress">En cours</option>
+              <option value="done">Terminee</option>
+            </select>
+          </label>
+          <label>
+            Echeance
+            <input type="date" name="due_date" />
+          </label>
+        </div>
+        <div class="row">
+          <button type="submit" class="btn btn-primary" id="task-submit-btn">Ajouter</button>
+          <button type="button" class="btn btn-ghost hidden" id="task-cancel-btn">Annuler</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="list-header">
+        <h2>Mes taches</h2>
+        <select id="filter-status">
+          <option value="">Toutes</option>
+          <option value="todo">A faire</option>
+          <option value="in_progress">En cours</option>
+          <option value="done">Terminee</option>
+        </select>
+      </div>
+      <ul id="task-list" class="task-list"></ul>
+      <p id="empty-state" class="empty hidden">Aucune tache pour le moment.</p>
+    </div>
+  </section>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
