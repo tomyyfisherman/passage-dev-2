@@ -142,11 +142,14 @@ Toutes les routes `/api/tasks/*` nécessitent un header `Authorization: Bearer <
 | POST    | `/api/auth/register`| Création de compte (email + mot de passe)      |
 | POST    | `/api/auth/login`   | Connexion, retourne un JWT                     |
 | GET     | `/api/auth/me`      | Informations sur l'utilisateur connecté        |
+| PATCH   | `/api/auth/me`      | Modification du nom affiché                     |
+| DELETE  | `/api/auth/me`      | Suppression définitive du compte (mot de passe requis dans le corps de la requête) |
 | GET     | `/api/tasks`        | Liste des tâches de l'utilisateur (filtre `?status=`) |
 | POST    | `/api/tasks`        | Création d'une tâche                            |
 | GET     | `/api/tasks/:id`    | Détail d'une tâche                              |
 | PUT     | `/api/tasks/:id`    | Modification d'une tâche                        |
 | DELETE  | `/api/tasks/:id`    | Suppression d'une tâche                         |
+| DELETE  | `/api/tasks`        | Suppression de toutes les tâches de l'utilisateur |
 
 ## Limites connues / pistes d'amélioration
 

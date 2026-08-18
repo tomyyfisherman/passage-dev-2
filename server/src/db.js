@@ -15,8 +15,11 @@ const schema = `
     id SERIAL PRIMARY KEY,
     email TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
+    name TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
+
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS name TEXT;
 
   CREATE TABLE IF NOT EXISTS tasks (
     id SERIAL PRIMARY KEY,

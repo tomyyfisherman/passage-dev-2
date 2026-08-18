@@ -22,4 +22,22 @@ const loginValidators = [
     .notEmpty().withMessage('Le mot de passe est requis.'),
 ];
 
-module.exports = { registerValidators, loginValidators };
+const updateProfileValidators = [
+  body('name')
+    .optional({ checkFalsy: true })
+    .trim()
+    .isLength({ max: 100 }).withMessage('Le nom ne doit pas dépasser 100 caractères.'),
+];
+
+const deleteAccountValidators = [
+  body('password')
+    .isString()
+    .notEmpty().withMessage('Le mot de passe est requis pour confirmer la suppression.'),
+];
+
+module.exports = {
+  registerValidators,
+  loginValidators,
+  updateProfileValidators,
+  deleteAccountValidators,
+};

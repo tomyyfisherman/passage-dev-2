@@ -199,6 +199,13 @@
           <h1 id="dashboard-greeting">Bonjour 👋</h1>
           <p class="dashboard-sub">Voici un aperçu de vos tâches.</p>
         </div>
+        <button class="btn btn-ghost" id="settings-btn">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+            <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" stroke-width="1.8" fill="none"/>
+            <path d="M19.4 13.5a1.7 1.7 0 0 0 .34 1.87l.06.06a2.06 2.06 0 1 1-2.91 2.91l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V19.6a2.06 2.06 0 1 1-4.12 0v-.09a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2.06 2.06 0 1 1-2.91-2.91l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H4.4a2.06 2.06 0 1 1 0-4.12h.09a1.7 1.7 0 0 0 1.56-1.11 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2.06 2.06 0 1 1 2.91-2.91l.06.06a1.7 1.7 0 0 0 1.87.34h.08A1.7 1.7 0 0 0 11.6 3V2.9a2.06 2.06 0 1 1 4.12 0V3a1.7 1.7 0 0 0 1.03 1.56h.08a1.7 1.7 0 0 0 1.87-.34l.06-.06a2.06 2.06 0 1 1 2.91 2.91l-.06.06a1.7 1.7 0 0 0-.34 1.87v.08c.28.68.9 1.14 1.65 1.11h.09a2.06 2.06 0 1 1 0 4.12h-.09c-.72 0-1.37.42-1.56 1.11Z" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round"/>
+          </svg>
+          Paramètres
+        </button>
       </div>
 
       <div class="stats-grid">
@@ -276,6 +283,41 @@
   </section>
 
 </main>
+
+<div class="modal-overlay hidden" id="settings-modal">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <h2>Paramètres du compte</h2>
+      <button class="modal-close" id="settings-close-btn" aria-label="Fermer">&times;</button>
+    </div>
+
+    <section class="modal-section">
+      <h3>Nom</h3>
+      <p class="modal-hint">Affiché sur votre tableau de bord.</p>
+      <p id="settings-name-error" class="error hidden"></p>
+      <form id="settings-name-form" class="settings-inline-form">
+        <input type="text" name="name" maxlength="100" placeholder="Votre nom" />
+        <button type="submit" class="btn btn-glow btn-sm">Enregistrer</button>
+      </form>
+    </section>
+
+    <section class="modal-section modal-section-danger">
+      <h3>Supprimer mes données</h3>
+      <p class="modal-hint">Supprime définitivement toutes vos tâches. Votre compte reste actif.</p>
+      <button type="button" class="btn btn-danger" id="clear-tasks-btn">Supprimer toutes mes tâches</button>
+    </section>
+
+    <section class="modal-section modal-section-danger">
+      <h3>Supprimer mon compte</h3>
+      <p class="modal-hint">Action définitive : votre compte et toutes vos tâches seront supprimés de la base de données. Cette action est irréversible.</p>
+      <p id="settings-delete-error" class="error hidden"></p>
+      <form id="delete-account-form" class="settings-inline-form">
+        <input type="password" name="password" placeholder="Confirmez avec votre mot de passe" required autocomplete="current-password" />
+        <button type="submit" class="btn btn-danger">Supprimer définitivement</button>
+      </form>
+    </section>
+  </div>
+</div>
 
 <script src="app.js"></script>
 </body>

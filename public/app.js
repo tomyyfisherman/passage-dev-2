@@ -40,6 +40,15 @@ const emptyState = document.getElementById('empty-state');
 const filterStatus = document.getElementById('filter-status');
 const dashboardGreeting = document.getElementById('dashboard-greeting');
 
+const settingsBtn = document.getElementById('settings-btn');
+const settingsModal = document.getElementById('settings-modal');
+const settingsCloseBtn = document.getElementById('settings-close-btn');
+const settingsNameForm = document.getElementById('settings-name-form');
+const settingsNameError = document.getElementById('settings-name-error');
+const clearTasksBtn = document.getElementById('clear-tasks-btn');
+const deleteAccountForm = document.getElementById('delete-account-form');
+const settingsDeleteError = document.getElementById('settings-delete-error');
+
 // ---- API helper ----
 async function api(path, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
@@ -121,12 +130,17 @@ document.querySelectorAll('[data-tab-link]').forEach((link) => {
 function enterApp(user) {
   state.user = user;
   userEmailEl.textContent = user.email;
-  dashboardGreeting.textContent = `Bonjour, ${user.email.split('@')[0]} \u{1F44B}`;
+  renderGreeting();
   navbarActionsGuest.classList.add('hidden');
   navbarActionsUser.classList.remove('hidden');
   navDashboardLink.classList.remove('hidden');
   navigateTo('dashboard');
   loadTasks();
+}
+
+function renderGreeting() {
+  const displayName = state.user?.name || state.user?.email.split('@')[0];
+  dashboardGreeting.textContent = `Bonjour, ${displayName} \u{1F44B}`;
 }
 
 function leaveApp() {
@@ -301,6 +315,70 @@ async function deleteTask(id) {
     alert(err.message);
   }
 }
+
+// ---- Settings modal ----
+function openSettingsModal() {
+  settingsNameForm.elements.name.value = state.user?.name || '';
+  settingsNameError.classList.add('hidden');
+  settingsDeleteError.classList.add('hidden');
+  deleteAccountForm.reset();
+  settingsModal.classList.remove('hidden');
+}
+
+function closeSettingsModal() {
+  settingsModal.classList.add('hidden');
+}
+
+settingsBtn.addEventListener('click', openSettingsModal);
+settingsCloseBtn.addEventListener('click', closeSettingsModal);
+settingsModal.addEventListener('click', (e) => {
+  if (e.target === settingsModal) closeSettingsModal();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !settingsModal.classList.contains('hidden')) closeSettingsModal();
+});
+
+settingsNameForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  settingsNameError.classList.add('hidden');
+  const name = settingsNameForm.elements.name.value;
+  try {
+    const data = await api('/auth/me', { method: 'PATCH', body: JSON.stringify({ name }) });
+    state.user = data.user;
+    renderGreeting();
+  } catch (err) {
+    settingsNameError.textContent = err.message;
+    settingsNameError.classList.remove('hidden');
+  }
+});
+
+clearTasksBtn.addEventListener('click', async () => {
+  if (!confirm('Supprimer toutes vos tâches ? Cette action est irréversible.')) return;
+  try {
+    await api('/tasks', { method: 'DELETE' });
+    loadTasks();
+  } catch (err) {
+    alert(err.message);
+  }
+});
+
+deleteAccountForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  settingsDeleteError.classList.add('hidden');
+
+  if (!confirm('Supprimer définitivement votre compte et toutes vos données ? Cette action est irréversible.')) return;
+
+  const password = deleteAccountForm.elements.password.value;
+  try {
+    await api('/auth/me', { method: 'DELETE', body: JSON.stringify({ password }) });
+    closeSettingsModal();
+    leaveApp();
+    alert('Votre compte a été supprimé définitivement.');
+  } catch (err) {
+    settingsDeleteError.textContent = err.message;
+    settingsDeleteError.classList.remove('hidden');
+  }
+});
 
 // ---- Bootstrap ----
 (async function init() {
