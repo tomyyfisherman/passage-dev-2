@@ -47,6 +47,12 @@
     radial-gradient(750px 600px at 20% -120px, rgba(42, 47, 107, 0.85) 0%, rgba(42, 47, 107, 0) 70%),
     radial-gradient(600px 500px at right -60px bottom 420px, rgba(58, 27, 92, 0.5) 0%, rgba(58, 27, 92, 0) 65%),
     var(--bg);
+  /* Glow ancre en haut du document (pas du viewport) : visible derriere la navbar
+     flottante sur toutes les pages, s'estompe naturellement en descendant. */
+  --gradient-page:
+    radial-gradient(750px 600px at 18% -160px, rgba(42, 47, 107, 0.7) 0%, rgba(42, 47, 107, 0) 70%),
+    radial-gradient(650px 550px at 88% 220px, rgba(58, 27, 92, 0.4) 0%, rgba(58, 27, 92, 0) 65%),
+    var(--bg);
 
   --radius-sm: 8px;
   --radius-md: 14px;
@@ -73,7 +79,7 @@ html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-height) + var
 body {
   margin: 0;
   font-family: var(--font-sans);
-  background: var(--bg);
+  background: var(--gradient-page);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
 }
