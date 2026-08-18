@@ -8,6 +8,7 @@ if (!process.env.JWT_SECRET) {
   process.exit(1);
 }
 
+const db = require('./db');
 const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/tasks');
 
@@ -32,6 +33,14 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Serveur démarré sur http://localhost:${PORT}`);
-});
+
+db.ready
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Serveur démarré sur http://localhost:${PORT} (base de données : ${db.isPostgres ? 'PostgreSQL' : 'SQLite'})`);
+    });
+  })
+  .catch((err) => {
+    console.error('Erreur lors de l\'initialisation de la base de données :', err);
+    process.exit(1);
+  });

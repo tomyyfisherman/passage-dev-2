@@ -13,251 +13,57 @@ const router = express.Router();
 
 router.use(requireAuth);
 
-/**
- * Convertit une valeur en type accepté par SQLite.
- *
- * SQLite accepte uniquement :
- * - number
- * - string
- * - bigint
- * - Buffer
- * - null
- */
-function toSqliteValue(value, fallback = null) {
-  if (value === undefined || value === null) {
-    return fallback;
-  }
-
-  if (
-    typeof value === 'string' ||
-    typeof value === 'number' ||
-    typeof value === 'bigint' ||
-    Buffer.isBuffer(value)
-  ) {
-    return value;
-  }
-
-  if (value instanceof Date) {
-    return value.toISOString();
-  }
-
-  if (typeof value === 'object') {
-    return JSON.stringify(value);
-  }
-
-  return String(value);
-}
-
-const listStmt = db.prepare(
-  'SELECT * FROM tasks WHERE user_id = ? ORDER BY created_at DESC'
-);
-
-const listByStatusStmt = db.prepare(
-  'SELECT * FROM tasks WHERE user_id = ? AND status = ? ORDER BY created_at DESC'
-);
-
-const findOneStmt = db.prepare(
-  'SELECT * FROM tasks WHERE id = ? AND user_id = ?'
-);
-
-const insertStmt = db.prepare(`
-  INSERT INTO tasks (
-    user_id,
-    title,
-    description,
-    status,
-    due_date
-  )
-  VALUES (?, ?, ?, ?, ?)
-`);
-
-const updateStmt = db.prepare(`
-  UPDATE tasks
-  SET
-    title = ?,
-    description = ?,
-    status = ?,
-    due_date = ?,
-    updated_at = datetime('now')
-  WHERE id = ? AND user_id = ?
-`);
-
-const deleteStmt = db.prepare(
-  'DELETE FROM tasks WHERE id = ? AND user_id = ?'
-);
-
-// ============================================================
-// READ - LIST
-// ============================================================
-
-router.get('/', listQueryValidators, validate, (req, res) => {
-  const userId = toSqliteValue(req.user.id);
-  const status = req.query.status;
-
-  let rows;
-
-  if (status) {
-    rows = listByStatusStmt.all(
-      userId,
-      toSqliteValue(status)
-    );
-  } else {
-    rows = listStmt.all(userId);
-  }
-
-  res.json({
-    tasks: rows,
-  });
+// READ (list)
+router.get('/', listQueryValidators, validate, async (req, res) => {
+  const { status } = req.query;
+  const rows = status
+    ? await db.all('SELECT * FROM tasks WHERE user_id = ? AND status = ? ORDER BY created_at DESC', [req.user.id, status])
+    : await db.all('SELECT * FROM tasks WHERE user_id = ? ORDER BY created_at DESC', [req.user.id]);
+  res.json({ tasks: rows });
 });
 
-// ============================================================
-// READ - ONE
-// ============================================================
-
-router.get('/:id', idParamValidator, validate, (req, res) => {
-  const id = toSqliteValue(req.params.id);
-  const userId = toSqliteValue(req.user.id);
-
-  const task = findOneStmt.get(id, userId);
-
-  if (!task) {
-    return res.status(404).json({
-      error: 'Tâche introuvable.',
-    });
-  }
-
-  res.json({
-    task,
-  });
+// READ (one)
+router.get('/:id', idParamValidator, validate, async (req, res) => {
+  const task = await db.get('SELECT * FROM tasks WHERE id = ? AND user_id = ?', [req.params.id, req.user.id]);
+  if (!task) return res.status(404).json({ error: 'Tâche introuvable.' });
+  res.json({ task });
 });
 
-// ============================================================
 // CREATE
-// ============================================================
-
-router.post('/', createTaskValidators, validate, (req, res) => {
-  const userId = toSqliteValue(req.user.id);
-
-  const title = toSqliteValue(
-    req.body.title,
-    ''
+router.post('/', createTaskValidators, validate, async (req, res) => {
+  const { title, description = '', status = 'todo', due_date = null } = req.body;
+  const info = await db.run(
+    'INSERT INTO tasks (user_id, title, description, status, due_date) VALUES (?, ?, ?, ?, ?)',
+    [req.user.id, title, description, status, due_date]
   );
-
-  const description = toSqliteValue(
-    req.body.description,
-    ''
-  );
-
-  const status = toSqliteValue(
-    req.body.status,
-    'todo'
-  );
-
-  const dueDate = toSqliteValue(
-    req.body.due_date,
-    null
-  );
-
-  const info = insertStmt.run(
-    userId,
-    title,
-    description,
-    status,
-    dueDate
-  );
-
-  const task = findOneStmt.get(
-    toSqliteValue(info.lastInsertRowid),
-    userId
-  );
-
-  res.status(201).json({
-    task,
-  });
+  const task = await db.get('SELECT * FROM tasks WHERE id = ? AND user_id = ?', [info.lastInsertRowid, req.user.id]);
+  res.status(201).json({ task });
 });
 
-// ============================================================
 // UPDATE
-// ============================================================
+router.put('/:id', updateTaskValidators, validate, async (req, res) => {
+  const existing = await db.get('SELECT * FROM tasks WHERE id = ? AND user_id = ?', [req.params.id, req.user.id]);
+  if (!existing) return res.status(404).json({ error: 'Tâche introuvable.' });
 
-router.put('/:id', updateTaskValidators, validate, (req, res) => {
-  const id = toSqliteValue(req.params.id);
-  const userId = toSqliteValue(req.user.id);
+  const title = req.body.title ?? existing.title;
+  const description = req.body.description ?? existing.description;
+  const status = req.body.status ?? existing.status;
+  const due_date = req.body.due_date ?? existing.due_date;
 
-  const existing = findOneStmt.get(
-    id,
-    userId
+  await db.run(
+    "UPDATE tasks SET title = ?, description = ?, status = ?, due_date = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?",
+    [title, description, status, due_date, req.params.id, req.user.id]
   );
-
-  if (!existing) {
-    return res.status(404).json({
-      error: 'Tâche introuvable.',
-    });
-  }
-
-  const title = toSqliteValue(
-    req.body.title ?? existing.title,
-    ''
-  );
-
-  const description = toSqliteValue(
-    req.body.description ?? existing.description,
-    ''
-  );
-
-  const status = toSqliteValue(
-    req.body.status ?? existing.status,
-    'todo'
-  );
-
-  const dueDate = toSqliteValue(
-    req.body.due_date ?? existing.due_date,
-    null
-  );
-
-  updateStmt.run(
-    title,
-    description,
-    status,
-    dueDate,
-    id,
-    userId
-  );
-
-  const task = findOneStmt.get(
-    id,
-    userId
-  );
-
-  res.json({
-    task,
-  });
+  const task = await db.get('SELECT * FROM tasks WHERE id = ? AND user_id = ?', [req.params.id, req.user.id]);
+  res.json({ task });
 });
 
-// ============================================================
 // DELETE
-// ============================================================
+router.delete('/:id', idParamValidator, validate, async (req, res) => {
+  const existing = await db.get('SELECT * FROM tasks WHERE id = ? AND user_id = ?', [req.params.id, req.user.id]);
+  if (!existing) return res.status(404).json({ error: 'Tâche introuvable.' });
 
-router.delete('/:id', idParamValidator, validate, (req, res) => {
-  const id = toSqliteValue(req.params.id);
-  const userId = toSqliteValue(req.user.id);
-
-  const existing = findOneStmt.get(
-    id,
-    userId
-  );
-
-  if (!existing) {
-    return res.status(404).json({
-      error: 'Tâche introuvable.',
-    });
-  }
-
-  deleteStmt.run(
-    id,
-    userId
-  );
-
+  await db.run('DELETE FROM tasks WHERE id = ? AND user_id = ?', [req.params.id, req.user.id]);
   res.status(204).send();
 });
 

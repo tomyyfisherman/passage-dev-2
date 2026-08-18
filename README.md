@@ -14,10 +14,10 @@ produit, une **page de connexion / inscription**, et un **tableau de bord**
 ## Stack technique
 
 - **Backend** : Node.js + [Express](https://expressjs.com/)
-- **Base de données** : SQLite via [`better-sqlite3`](https://github.com/WiseLibs/better-sqlite3) (API synchrone, requêtes préparées)
+- **Base de données** : SQLite via [`better-sqlite3`](https://github.com/WiseLibs/better-sqlite3) en local (zéro configuration), ou PostgreSQL via [`pg`](https://node-postgres.com/) en production si `DATABASE_URL` est défini (voir [Persistance en production](#persistance-en-production)). Requêtes préparées dans les deux cas
 - **Authentification** : JWT (`jsonwebtoken`), mot de passe haché avec `scrypt` (module `crypto` natif de Node, pas de dépendance native supplémentaire)
 - **Validation** : [`express-validator`](https://express-validator.github.io/) côté serveur, sur chaque route
-- **Frontend** : HTML / CSS / JavaScript vanilla (aucun framework, aucune étape de build), servi statiquement par Express — page d'accueil, page de connexion/inscription et tableau de bord gérés comme trois vues d'une même page (`public/app.js`)
+- **Frontend** : HTML / CSS / JavaScript vanilla (aucun framework, aucune étape de build), servi statiquement par Express. Page d'accueil, page de connexion/inscription et tableau de bord gérés comme trois vues d'une même page (`public/app.js`)
 
 ## Choix techniques (résumé)
 
@@ -39,6 +39,11 @@ produit, une **page de connexion / inscription**, et un **tableau de bord**
   (pas de gestion CSRF nécessaire) et rend l'API directement testable avec `curl`/Postman.
 - **Frontend vanilla** : le périmètre de l'exercice ne justifiait pas un framework front ; un seul
   fichier `app.js` suffit à couvrir l'inscription/connexion et le CRUD des tâches.
+- **Base de données switchable (SQLite / PostgreSQL)** : `server/src/db.js` expose une petite interface
+  asynchrone commune (`all`, `get`, `run`) utilisée par toutes les routes. En local, sans configuration,
+  elle s'appuie sur un fichier SQLite. Si `DATABASE_URL` est défini, elle bascule sur PostgreSQL via un
+  pool `pg`, en convertissant automatiquement les paramètres positionnels `?` en `$1, $2, ...`. Les
+  requêtes métier (dans `routes/auth.js` et `routes/tasks.js`) restent identiques dans les deux cas.
 
 ## Structure du projet
 
@@ -51,7 +56,7 @@ produit, une **page de connexion / inscription**, et un **tableau de bord**
 ├── server/
 │   ├── src/
 │   │   ├── index.js         # Point d'entrée Express
-│   │   ├── db.js            # Connexion SQLite + création des tables
+│   │   ├── db.js            # Connexion SQLite ou PostgreSQL (selon DATABASE_URL) + migrations
 │   │   ├── middleware/
 │   │   │   ├── requireAuth.js
 │   │   │   └── validate.js
@@ -88,7 +93,8 @@ Définies dans `server/.env` (voir `server/.env.example`) :
 | `PORT`            | Port d'écoute du serveur HTTP                             | `3000`                    |
 | `JWT_SECRET`      | Secret de signature des JWT (à changer en production)     | chaîne aléatoire longue   |
 | `JWT_EXPIRES_IN`  | Durée de validité des tokens                               | `7d`                      |
-| `DB_PATH`         | Chemin du fichier SQLite (créé automatiquement)            | `./data/app.db`           |
+| `DB_PATH`         | Chemin du fichier SQLite, utilisé si `DATABASE_URL` n'est pas défini | `./data/app.db` |
+| `DATABASE_URL`    | Optionnel. Chaîne de connexion PostgreSQL ; si définie, remplace SQLite | `postgresql://...` |
 
 Pour générer un secret aléatoire :
 
@@ -113,6 +119,26 @@ npm run dev
 ```
 
 La base de données SQLite est créée automatiquement au premier lancement dans `server/data/app.db`.
+
+## Persistance en production
+
+Sur un service web comme **Render** (plan gratuit, sans disque persistant), le système de fichiers
+est réinitialisé à chaque redéploiement : un fichier SQLite local serait donc perdu à chaque `git push`.
+
+Pour éviter ça, l'application peut utiliser une base **PostgreSQL externe** (indépendante du disque du
+service web) dès que la variable `DATABASE_URL` est définie. [Neon](https://neon.tech) propose un plan
+gratuit adapté :
+
+1. Créer un compte sur [neon.tech](https://neon.tech) et un nouveau projet Postgres.
+2. Copier la chaîne de connexion fournie (elle ressemble à
+   `postgresql://user:password@ep-xxxxx.neon.tech/dbname?sslmode=require`).
+3. Dans le dashboard Render du service, onglet **Environment**, ajouter une variable
+   `DATABASE_URL` avec cette valeur (en plus de `JWT_SECRET` et `JWT_EXPIRES_IN`).
+4. Redéployer. Au démarrage, le serveur détecte `DATABASE_URL`, crée les tables si besoin sur Neon,
+   et toutes les données (comptes, tâches) survivent désormais aux redéploiements.
+
+En local, ne pas définir `DATABASE_URL` : l'application continue d'utiliser SQLite automatiquement,
+sans aucune installation supplémentaire.
 
 ## API
 

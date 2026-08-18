@@ -82,6 +82,17 @@ document.querySelectorAll('[data-nav]').forEach((el) => {
   });
 });
 
+document.querySelectorAll('[data-scroll-to]').forEach((el) => {
+  el.addEventListener('click', (e) => {
+    e.preventDefault();
+    const targetId = el.dataset.scrollTo;
+    navigateTo('landing');
+    requestAnimationFrame(() => {
+      document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+});
+
 navbarBurger.addEventListener('click', () => {
   navbar.classList.toggle('menu-open');
 });
