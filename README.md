@@ -7,13 +7,17 @@ Chaque utilisateur crée un compte, se connecte, puis gère ses propres tâches
 (création, lecture, modification, suppression). Les tâches d'un utilisateur ne
 sont jamais visibles ni modifiables par un autre utilisateur.
 
+L'application comporte trois vues : une **page d'accueil** qui présente le
+produit, une **page de connexion / inscription**, et un **tableau de bord**
+(statistiques + gestion des tâches) une fois connecté.
+
 ## Stack technique
 
 - **Backend** : Node.js + [Express](https://expressjs.com/)
 - **Base de données** : SQLite via [`better-sqlite3`](https://github.com/WiseLibs/better-sqlite3) (API synchrone, requêtes préparées)
 - **Authentification** : JWT (`jsonwebtoken`), mot de passe haché avec `scrypt` (module `crypto` natif de Node, pas de dépendance native supplémentaire)
 - **Validation** : [`express-validator`](https://express-validator.github.io/) côté serveur, sur chaque route
-- **Frontend** : HTML / CSS / JavaScript vanilla (aucun framework, aucune étape de build), servi statiquement par Express
+- **Frontend** : HTML / CSS / JavaScript vanilla (aucun framework, aucune étape de build), servi statiquement par Express — page d'accueil, page de connexion/inscription et tableau de bord gérés comme trois vues d'une même page (`public/app.js`)
 
 ## Choix techniques (résumé)
 

@@ -26,8 +26,7 @@ const createTaskValidators = [
     .isIn(STATUSES).withMessage(`Le statut doit être l'un de : ${STATUSES.join(', ')}.`),
   body('due_date')
     .optional({ checkFalsy: true })
-    .isISO8601().withMessage('La date d\'échéance doit être une date valide (AAAA-MM-JJ).')
-    .toDate(),
+    .isISO8601().withMessage('La date d\'échéance doit être une date valide (AAAA-MM-JJ).'),
 ];
 
 const updateTaskValidators = [
@@ -46,8 +45,7 @@ const updateTaskValidators = [
     .isIn(STATUSES).withMessage(`Le statut doit être l'un de : ${STATUSES.join(', ')}.`),
   body('due_date')
     .optional({ checkFalsy: true })
-    .isISO8601().withMessage('La date d\'échéance doit être une date valide (AAAA-MM-JJ).')
-    .toDate(),
+    .isISO8601().withMessage('La date d\'échéance doit être une date valide (AAAA-MM-JJ).'),
 ];
 
 module.exports = {

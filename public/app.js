@@ -12,10 +12,18 @@ const state = {
 };
 
 // ---- DOM refs ----
-const authSection = document.getElementById('auth-section');
-const appSection = document.getElementById('app-section');
-const userBox = document.getElementById('user-box');
+const navbar = document.getElementById('navbar');
+const navbarBurger = document.getElementById('navbar-burger');
+const navDashboardLink = document.getElementById('nav-dashboard-link');
+const navbarActionsGuest = document.getElementById('navbar-actions-guest');
+const navbarActionsUser = document.getElementById('navbar-actions-user');
 const userEmailEl = document.getElementById('user-email');
+
+const views = {
+  landing: document.getElementById('view-landing'),
+  auth: document.getElementById('view-auth'),
+  dashboard: document.getElementById('view-dashboard'),
+};
 
 const loginForm = document.getElementById('login-form');
 const registerForm = document.getElementById('register-form');
@@ -24,11 +32,13 @@ const registerError = document.getElementById('register-error');
 
 const taskForm = document.getElementById('task-form');
 const taskFormError = document.getElementById('task-form-error');
+const taskFormTitle = document.getElementById('task-form-title');
 const taskSubmitBtn = document.getElementById('task-submit-btn');
 const taskCancelBtn = document.getElementById('task-cancel-btn');
 const taskList = document.getElementById('task-list');
 const emptyState = document.getElementById('empty-state');
 const filterStatus = document.getElementById('filter-status');
+const dashboardGreeting = document.getElementById('dashboard-greeting');
 
 // ---- API helper ----
 async function api(path, options = {}) {
@@ -48,33 +58,74 @@ async function api(path, options = {}) {
   return data;
 }
 
-// ---- Tabs ----
-document.querySelectorAll('.tab-btn').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.tab-panel').forEach((p) => p.classList.add('hidden'));
-    document.getElementById(`${btn.dataset.tab}-form`).classList.remove('hidden');
+// ---- View routing ----
+function navigateTo(view, options = {}) {
+  Object.entries(views).forEach(([name, el]) => {
+    el.classList.toggle('hidden', name !== view);
+  });
+  navbar.classList.remove('menu-open');
+  window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+
+  if (view === 'auth' && options.tab) {
+    setAuthTab(options.tab);
+  }
+}
+
+document.querySelectorAll('[data-nav]').forEach((el) => {
+  el.addEventListener('click', (e) => {
+    e.preventDefault();
+    const target = el.dataset.nav;
+    if (target === 'landing') return navigateTo('landing');
+    if (target === 'dashboard') return state.user ? navigateTo('dashboard') : navigateTo('auth', { tab: 'login' });
+    if (target === 'auth-login') return navigateTo('auth', { tab: 'login' });
+    if (target === 'auth-register') return navigateTo('auth', { tab: 'register' });
   });
 });
 
-// ---- Auth ----
-function showApp(user) {
+navbarBurger.addEventListener('click', () => {
+  navbar.classList.toggle('menu-open');
+});
+
+// ---- Auth tabs ----
+function setAuthTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b) => b.classList.toggle('active', b.dataset.tab === tab));
+  document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
+  document.getElementById('register-form').classList.toggle('hidden', tab !== 'register');
+  document.getElementById('auth-hint-login').classList.toggle('hidden', tab !== 'login');
+  document.getElementById('auth-hint-register').classList.toggle('hidden', tab !== 'register');
+}
+
+document.querySelectorAll('.tab-btn').forEach((btn) => {
+  btn.addEventListener('click', () => setAuthTab(btn.dataset.tab));
+});
+
+document.querySelectorAll('[data-tab-link]').forEach((link) => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    setAuthTab(link.dataset.tabLink);
+  });
+});
+
+// ---- Auth session ----
+function enterApp(user) {
   state.user = user;
   userEmailEl.textContent = user.email;
-  userBox.classList.remove('hidden');
-  authSection.classList.add('hidden');
-  appSection.classList.remove('hidden');
+  dashboardGreeting.textContent = `Bonjour, ${user.email.split('@')[0]} \u{1F44B}`;
+  navbarActionsGuest.classList.add('hidden');
+  navbarActionsUser.classList.remove('hidden');
+  navDashboardLink.classList.remove('hidden');
+  navigateTo('dashboard');
   loadTasks();
 }
 
-function showAuth() {
+function leaveApp() {
   state.user = null;
   state.token = null;
   localStorage.removeItem('token');
-  userBox.classList.add('hidden');
-  authSection.classList.remove('hidden');
-  appSection.classList.add('hidden');
+  navbarActionsGuest.classList.remove('hidden');
+  navbarActionsUser.classList.add('hidden');
+  navDashboardLink.classList.add('hidden');
+  navigateTo('landing');
 }
 
 loginForm.addEventListener('submit', async (e) => {
@@ -88,7 +139,7 @@ loginForm.addEventListener('submit', async (e) => {
     });
     state.token = data.token;
     localStorage.setItem('token', data.token);
-    showApp(data.user);
+    enterApp(data.user);
     loginForm.reset();
   } catch (err) {
     loginError.textContent = err.message;
@@ -107,7 +158,7 @@ registerForm.addEventListener('submit', async (e) => {
     });
     state.token = data.token;
     localStorage.setItem('token', data.token);
-    showApp(data.user);
+    enterApp(data.user);
     registerForm.reset();
   } catch (err) {
     registerError.textContent = err.message;
@@ -115,14 +166,15 @@ registerForm.addEventListener('submit', async (e) => {
   }
 });
 
-document.getElementById('logout-btn').addEventListener('click', showAuth);
+document.getElementById('logout-btn').addEventListener('click', leaveApp);
 
 // ---- Tasks ----
 function resetTaskForm() {
   taskForm.reset();
   taskForm.elements.id.value = '';
   state.editingId = null;
-  taskSubmitBtn.textContent = 'Ajouter';
+  taskFormTitle.textContent = 'Nouvelle tâche';
+  taskSubmitBtn.textContent = 'Ajouter la tâche';
   taskCancelBtn.classList.add('hidden');
   taskFormError.classList.add('hidden');
 }
@@ -164,11 +216,20 @@ async function loadTasks() {
     const data = await api(`/tasks${query}`);
     state.tasks = data.tasks;
     renderTasks();
+    updateStats();
   } catch (err) {
     if (err.message.includes('Token') || err.message.includes('Authentification')) {
-      showAuth();
+      leaveApp();
     }
   }
+}
+
+function updateStats() {
+  const all = state.tasks;
+  document.getElementById('stat-total').textContent = all.length;
+  document.getElementById('stat-todo').textContent = all.filter((t) => t.status === 'todo').length;
+  document.getElementById('stat-progress').textContent = all.filter((t) => t.status === 'in_progress').length;
+  document.getElementById('stat-done').textContent = all.filter((t) => t.status === 'done').length;
 }
 
 function renderTasks() {
@@ -177,7 +238,7 @@ function renderTasks() {
 
   for (const task of state.tasks) {
     const li = document.createElement('li');
-    li.className = `task-item ${task.status === 'done' ? 'done' : ''}`;
+    li.className = `task-item status-${task.status}`;
 
     const due = task.due_date ? new Date(task.due_date).toLocaleDateString('fr-FR') : null;
 
@@ -191,8 +252,8 @@ function renderTasks() {
         </div>
       </div>
       <div class="task-actions">
-        <button class="btn btn-ghost" data-action="edit">Modifier</button>
-        <button class="btn btn-danger" data-action="delete">Supprimer</button>
+        <button class="btn btn-ghost btn-sm" data-action="edit">Modifier</button>
+        <button class="btn btn-danger btn-sm" data-action="delete">Supprimer</button>
       </div>
     `;
     li.querySelector('.task-title').textContent = task.title;
@@ -213,9 +274,10 @@ function startEdit(task) {
   taskForm.elements.description.value = task.description || '';
   taskForm.elements.status.value = task.status;
   taskForm.elements.due_date.value = task.due_date ? task.due_date.slice(0, 10) : '';
+  taskFormTitle.textContent = 'Modifier la tâche';
   taskSubmitBtn.textContent = 'Enregistrer';
   taskCancelBtn.classList.remove('hidden');
-  taskForm.scrollIntoView({ behavior: 'smooth' });
+  taskForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 async function deleteTask(id) {
@@ -231,11 +293,11 @@ async function deleteTask(id) {
 
 // ---- Bootstrap ----
 (async function init() {
-  if (!state.token) return showAuth();
+  if (!state.token) return navigateTo('landing');
   try {
     const data = await api('/auth/me');
-    showApp(data.user);
+    enterApp(data.user);
   } catch {
-    showAuth();
+    leaveApp();
   }
 })();
