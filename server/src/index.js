@@ -37,7 +37,7 @@ const PORT = process.env.PORT || 3000;
 db.ready
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`Serveur démarré sur http://localhost:${PORT} (base de données : ${db.isPostgres ? 'PostgreSQL' : 'SQLite'})`);
+      console.log(`Serveur démarré sur http://localhost:${PORT}`);
     });
   })
   .catch((err) => {
