@@ -43,12 +43,9 @@
   --gradient-navbar:
     linear-gradient(75deg, transparent 22%, rgba(255, 255, 255, 0.09) 40%, rgba(255, 255, 255, 0.16) 47%, rgba(255, 255, 255, 0.07) 54%, transparent 72%),
     linear-gradient(120deg, rgba(30, 41, 59, 0.92) 0%, rgba(11, 17, 32, 0.9) 55%, rgba(5, 7, 13, 0.94) 100%);
-  --gradient-hero:
-    radial-gradient(750px 600px at 20% -120px, rgba(42, 47, 107, 0.85) 0%, rgba(42, 47, 107, 0) 70%),
-    radial-gradient(600px 500px at right -60px bottom 420px, rgba(58, 27, 92, 0.5) 0%, rgba(58, 27, 92, 0) 65%),
-    var(--bg);
-  /* Glow ancre en haut du document (pas du viewport) : visible derriere la navbar
-     flottante sur toutes les pages, s'estompe naturellement en descendant. */
+  /* Glow ancre en haut du document (pas du viewport) : source unique pour tout le
+     haut de page (navbar, hero, marges), pour eviter toute coupure entre sections.
+     S'estompe naturellement en descendant. */
   --gradient-page:
     radial-gradient(750px 600px at 18% -160px, rgba(42, 47, 107, 0.7) 0%, rgba(42, 47, 107, 0) 70%),
     radial-gradient(650px 550px at 88% 220px, rgba(58, 27, 92, 0.4) 0%, rgba(58, 27, 92, 0) 65%),
@@ -309,7 +306,6 @@ main { padding-top: calc(var(--nav-height) + var(--nav-inset) * 2); }
    ============================================================ */
 .hero {
   position: relative;
-  background: var(--gradient-hero);
   overflow: hidden;
   padding: 6rem 1.5rem 7rem;
 }
