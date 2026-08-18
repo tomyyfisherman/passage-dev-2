@@ -135,10 +135,9 @@
 
   <!-- ===================== AUTH ===================== -->
   <section class="view hidden" id="view-auth">
-    <div class="auth-shell">
-      <div class="auth-brand-panel">
-        <div class="auth-brand-glow" aria-hidden="true"></div>
-        <a href="#" class="brand brand-on-dark" data-nav="landing">
+    <div class="auth-centered">
+      <div class="auth-card">
+        <a href="#" class="brand auth-card-brand" data-nav="landing">
           <span class="brand-mark" aria-hidden="true">
             <svg viewBox="0 0 32 32" width="20" height="20">
               <path d="M9 16.5l4.5 4.5L23 11" stroke="white" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
@@ -146,48 +145,44 @@
           </span>
           <span class="brand-name">TaskFlow</span>
         </a>
-        <h2 class="auth-brand-title">Reprenez le contrôle de vos journées.</h2>
-        <p class="auth-brand-text">Un espace privé pour vos tâches, protégé et accessible en un instant.</p>
-      </div>
+        <h2 class="auth-card-title">Reprenez le contrôle de vos journées.</h2>
+        <p class="auth-card-subtitle">Un espace privé pour vos tâches, protégé et accessible en un instant.</p>
 
-      <div class="auth-form-panel">
-        <div class="auth-form-inner">
-          <div class="tabs">
-            <button class="tab-btn active" data-tab="login">Connexion</button>
-            <button class="tab-btn" data-tab="register">Créer un compte</button>
-          </div>
-
-          <form id="login-form" class="tab-panel">
-            <p id="login-error" class="error hidden"></p>
-            <label>
-              Email
-              <input type="email" name="email" required autocomplete="email" placeholder="vous@exemple.com" />
-            </label>
-            <label>
-              Mot de passe
-              <input type="password" name="password" required autocomplete="current-password" placeholder="••••••••" />
-            </label>
-            <button type="submit" class="btn btn-glow btn-block">Se connecter</button>
-          </form>
-
-          <form id="register-form" class="tab-panel hidden">
-            <p id="register-error" class="error hidden"></p>
-            <label>
-              Email
-              <input type="email" name="email" required autocomplete="email" placeholder="vous@exemple.com" />
-            </label>
-            <label>
-              Mot de passe (8 caractères minimum)
-              <input type="password" name="password" required minlength="8" autocomplete="new-password" placeholder="••••••••" />
-            </label>
-            <button type="submit" class="btn btn-glow btn-block">Créer mon compte</button>
-          </form>
-
-          <p class="auth-switch-hint">
-            <span id="auth-hint-login">Pas encore de compte ? <a href="#" data-tab-link="register">Créer un compte</a></span>
-            <span id="auth-hint-register" class="hidden">Déjà inscrit ? <a href="#" data-tab-link="login">Se connecter</a></span>
-          </p>
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="login">Connexion</button>
+          <button class="tab-btn" data-tab="register">Créer un compte</button>
         </div>
+
+        <form id="login-form" class="tab-panel">
+          <p id="login-error" class="error hidden"></p>
+          <label>
+            Email
+            <input type="email" name="email" required autocomplete="email" placeholder="vous@exemple.com" />
+          </label>
+          <label>
+            Mot de passe
+            <input type="password" name="password" required autocomplete="current-password" placeholder="••••••••" />
+          </label>
+          <button type="submit" class="btn btn-glow btn-block">Se connecter</button>
+        </form>
+
+        <form id="register-form" class="tab-panel hidden">
+          <p id="register-error" class="error hidden"></p>
+          <label>
+            Email
+            <input type="email" name="email" required autocomplete="email" placeholder="vous@exemple.com" />
+          </label>
+          <label>
+            Mot de passe (8 caractères minimum)
+            <input type="password" name="password" required minlength="8" autocomplete="new-password" placeholder="••••••••" />
+          </label>
+          <button type="submit" class="btn btn-glow btn-block">Créer mon compte</button>
+        </form>
+
+        <p class="auth-switch-hint">
+          <span id="auth-hint-login">Pas encore de compte ? <a href="#" data-tab-link="register">Créer un compte</a></span>
+          <span id="auth-hint-register" class="hidden">Déjà inscrit ? <a href="#" data-tab-link="login">Se connecter</a></span>
+        </p>
       </div>
     </div>
   </section>
