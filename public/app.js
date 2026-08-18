@@ -129,8 +129,7 @@ document.querySelectorAll('[data-tab-link]').forEach((link) => {
 // ---- Auth session ----
 function enterApp(user) {
   state.user = user;
-  userEmailEl.textContent = user.email;
-  renderGreeting();
+  renderUserIdentity();
   navbarActionsGuest.classList.add('hidden');
   navbarActionsUser.classList.remove('hidden');
   navDashboardLink.classList.remove('hidden');
@@ -138,7 +137,8 @@ function enterApp(user) {
   loadTasks();
 }
 
-function renderGreeting() {
+function renderUserIdentity() {
+  userEmailEl.textContent = state.user?.name || state.user?.email;
   const displayName = state.user?.name || state.user?.email.split('@')[0];
   dashboardGreeting.textContent = `Bonjour, ${displayName} \u{1F44B}`;
 }
@@ -345,7 +345,7 @@ settingsNameForm.addEventListener('submit', async (e) => {
   try {
     const data = await api('/auth/me', { method: 'PATCH', body: JSON.stringify({ name }) });
     state.user = data.user;
-    renderGreeting();
+    renderUserIdentity();
   } catch (err) {
     settingsNameError.textContent = err.message;
     settingsNameError.classList.remove('hidden');
