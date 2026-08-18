@@ -23,24 +23,26 @@
       <span class="brand-name">TaskFlow</span>
     </a>
 
-    <div class="navbar-links" id="navbar-links">
-      <a href="#" class="nav-link" data-nav="landing">Accueil</a>
-      <a href="#features" class="nav-link" data-scroll-to="features">Fonctionnalités</a>
-      <a href="#security" class="nav-link" data-scroll-to="security">Sécurité</a>
-      <a href="#" class="nav-link hidden" id="nav-dashboard-link" data-nav="dashboard">Tableau de bord</a>
-    </div>
+    <div class="navbar-menu" id="navbar-menu">
+      <div class="navbar-links" id="navbar-links">
+        <a href="#" class="nav-link" data-nav="landing">Accueil</a>
+        <a href="#features" class="nav-link" data-scroll-to="features">Fonctionnalités</a>
+        <a href="#security" class="nav-link" data-scroll-to="security">Sécurité</a>
+        <a href="#" class="nav-link hidden" id="nav-dashboard-link" data-nav="dashboard">Tableau de bord</a>
+      </div>
 
-    <div class="navbar-actions" id="navbar-actions-guest">
-      <button class="btn btn-navghost" data-nav="auth-login">Connexion</button>
-      <button class="btn btn-glow" data-nav="auth-register">Créer un compte</button>
-    </div>
+      <div class="navbar-actions" id="navbar-actions-guest">
+        <button class="btn btn-navghost" data-nav="auth-login">Connexion</button>
+        <button class="btn btn-glow" data-nav="auth-register">Créer un compte</button>
+      </div>
 
-    <div class="navbar-actions hidden" id="navbar-actions-user">
-      <span class="user-chip">
-        <span class="user-dot" aria-hidden="true"></span>
-        <span id="user-email"></span>
-      </span>
-      <button class="btn btn-navghost" id="logout-btn">Déconnexion</button>
+      <div class="navbar-actions hidden" id="navbar-actions-user">
+        <span class="user-chip">
+          <span class="user-dot" aria-hidden="true"></span>
+          <span id="user-email"></span>
+        </span>
+        <button class="btn btn-navghost" id="logout-btn">Déconnexion</button>
+      </div>
     </div>
 
     <button class="navbar-burger" id="navbar-burger" aria-label="Ouvrir le menu">
